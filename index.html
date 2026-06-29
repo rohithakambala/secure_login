@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passwordless App Login</title>
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        /* Mobile App Card Container */
+        .app-card {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            min-height: 450px;
+        }
+
+        /* Top Icon Decorator */
+        .app-logo {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .screen h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .screen p {
+            color: #9ca3af;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 32px;
+        }
+
+        /* Step Panels Visibility Setup */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Form Layout Elements */
+        .input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .phone-input-field {
+            width: 100%;
+            background-color: #1f2937;
+            border: 2px solid #374151;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .phone-input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: #111827;
+        }
+
+        /* OTP Code Boxes Grid */
+        .otp-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .otp-box {
+            width: 60px;
+            height: 60px;
+            background-color: #1f2937;
+            border: 2px solid #374151;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .otp-box:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background-color: #111827;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Interactive Buttons */
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #ffffff;
+            color: #0b0f19;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-1px);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #9ca3af;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-card">
+        <!-- Logo Decorator -->
+        <div class="app-logo">⚡</div>
+
+        <!-- SCREEN 1: Phone Request Panel -->
+        <div class="screen active" id="screenPhone">
+            <h2>Secure Sign In</h2>
+            <p>Enter your phone number below. We will transmit a secure, one-time passcode verification token via SMS
+                text link.</p>
+
+            <div style="margin-bottom: 32px;">
+                <label class="input-label">Mobile Phone Number</label>
+                <input type="tel" id="phoneNumber" class="phone-input-field" placeholder="+1 (555) 000-0000" required>
+            </div>
+
+            <button type="button" class="action-btn" id="sendOtpBtn">Send Secure Code</button>
+        </div>
+
+        <!-- SCREEN 2: Verification Box Input Grid -->
+        <div class="screen" id="screenOtp">
+            <h2>Enter Code</h2>
+            <p>Type in the 4-digit verification sequence delivered to your mobile endpoint terminal window device.</p>
+
+            <label class="input-label" style="margin-bottom: 12px;">Verification Pin</label>
+            <div class="otp-grid">
+                <input type="text" class="otp-box" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-box" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-box" maxlength="1" pattern="\d*">
+                <input type="text" class="otp-box" maxlength="1" pattern="\d*">
+            </div>
+
+            <button type="button" class="action-btn" id="verifyOtpBtn">Verify & Login</button>
+            <a class="back-link" id="backToPhoneBtn">Change Phone Number</a>
+        </div>
+    </div>
+
+    <!-- UI Interaction Scripts -->
+    <script>
+        const screenPhone = document.getElementById('screenPhone');
+        const screenOtp = document.getElementById('screenOtp');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const backToPhoneBtn = document.getElementById('backToPhoneBtn');
+        const otpBoxes = document.querySelectorAll('.otp-box');
+
+        // Transitions user forward to OTP interface state
+        sendOtpBtn.addEventListener('click', () => {
+            const phoneVal = document.getElementById('phoneNumber').value.trim();
+            if (!phoneVal) {
+                alert('Please register a destination field input number.');
+                return;
+            }
+            screenPhone.classList.remove('active');
+            screenOtp.classList.add('active');
+            otpBoxes[0].focus(); // Focus first code field box
+        });
+
+        // Moves user back to phone edit state
+        backToPhoneBtn.addEventListener('click', () => {
+            screenOtp.classList.remove('active');
+            screenPhone.classList.add('active');
+        });
+
+        // Form logic mapping keyboard events for OTP box auto-shifting 
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                const val = e.target.value;
+                // If a number is entered, instantly skip cursor context forwards
+                if (val && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            });
+
+            box.addEventListener('keydown', (e) => {
+                // If user hits backspace on empty block, skip context backwards
+                if (e.key === 'Backspace' && !box.value && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+        });
+
+        // Verifies final entry mock submit
+        verifyOtpBtn.addEventListener('click', () => {
+            let combinedCode = "";
+            otpBoxes.forEach(box => combinedCode += box.value);
+
+            if (combinedCode.length < 4) {
+                alert('Please input the absolute full 4 digit string profile array sequence.');
+                return;
+            }
+            alert(`Authorizing system entry token code matches validation structure: ${combinedCode}`);
+        });
+    </script>
+</body>
+
+</html>
